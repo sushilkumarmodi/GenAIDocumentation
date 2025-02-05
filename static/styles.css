@@ -1,0 +1,35 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 20px;
+    width: 400px;
+    height: 200px;
+    margin: 50px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.Heading{
+    text-align: center;
+}
+
+.highlight {
+    border-color: #6cda6c;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    color: white;
+    background-color: #28a745;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#gallery {
+    margin-top: 20px;
+}

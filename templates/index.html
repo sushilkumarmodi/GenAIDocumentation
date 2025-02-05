@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop File Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="Heading">
+        <h1>GenAI Documentation Generation</h1>
+    </div>
+    <div id="drop-area">
+        <form class="my-form">
+            <p>Drag and drop files here or click to upload</p>
+            <input type="file" id="fileElem" multiple accept="*/*" style="display:none" onchange="handleFiles(this.files)">
+            <label class="button" for="fileElem">Select Files</label>
+        </form>
+        <div id="gallery"></div>
+
+        <button id="generateDocumentBtn" class="button" disabled onclick="generateDocument()">Generate Functional Document</button>
+        <button id="cancelBtn" class="button" disabled onclick="cancelSelection()">Cancel Selection</button>
+    </div>
+
+    <script>
+        let dropArea = document.getElementById('drop-area');
+        let selectedFiles = [];
+        let generateButton = document.getElementById('generateDocumentBtn');
+        let cancelButton = document.getElementById('cancelBtn');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop area when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            dropArea.classList.add('highlight');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('highlight');
+        }
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            selectedFiles = files;
+            const formData = new FormData();
+            for (let file of files) {
+                formData.append('file[]', file);
+            }
+
+            // Enable the buttons when files are selected
+            generateButton.disabled = false;
+            cancelButton.disabled = false;
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.responses);
+                displayResponse(data.responses);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function displayResponse(responses) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            responses.forEach(response => {
+                const p = document.createElement('p');
+                p.textContent = response;
+                gallery.appendChild(p);
+            });
+        }
+
+        // Function to generate functional document
+    function generateDocument() 
+    {
+        fetch('/generate-document',
+        {
+         method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();  // Receive the file content as a blob
+            } else {
+                console.error('Error generating the document');
+            }
+        })
+        .then(blob => {
+            // Create a download link and trigger it programmatically
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'functional_document.docx';  // Change file extension to .docx
+            document.body.appendChild(a);  // Append to the document
+            a.click();  // Trigger the download
+            a.remove();  // Remove the link after download
+        })
+        .catch(error => console.error('Error:', error));
+    }
+        // Function to cancel the file selection
+        function cancelSelection() {
+    // Make an API call to delete files from the uploads folder
+    fetch('/cancel-selection', {
+        method: 'POST',
+    })
+    .then(response => {
+        if (response.ok) {
+            // Clear the selected files and update the UI
+            selectedFiles = [];
+            document.getElementById('fileElem').value = '';  // Clear file input
+            document.getElementById('gallery').innerHTML = ''; // Clear gallery
+            generateButton.disabled = true;  // Disable buttons
+            cancelButton.disabled = true;
+            alert('File selection canceled and files deleted from the server.');
+        } else {
+            return response.json().then(data => {
+                alert(data.error || 'Failed to delete files on the server.');
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting files on the server.');
+    });
+}
+
+    </script>
+</body>
+</html>
