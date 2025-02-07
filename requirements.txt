@@ -64,8 +64,8 @@ langchain-groq
 langsmith
 lxml==4.9.3
 MarkupSafe==2.1.3
-matplotlib==3.8.0
-matplotlib-inline==0.1.6
+matplotlib
+matplotlib-inline
 mistune==3.0.2
 nbclient==0.8.0
 nbconvert==7.9.2
