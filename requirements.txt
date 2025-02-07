@@ -72,7 +72,7 @@ nbconvert==7.9.2
 nbformat==5.9.2
 nest-asyncio==1.5.8
 notebook_shim==0.2.3
-numpy==1.26.1
+numpy
 orjson==3.10.7
 overrides==7.4.0
 packaging==23.2
