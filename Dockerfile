@@ -1,4 +1,4 @@
-FROM python:alpine3.8
+FROM python:alpine3.10
 COPY . /app
 WORKDIR /app
 RUN apk add --no-cache gcc musl-dev libffi-dev
