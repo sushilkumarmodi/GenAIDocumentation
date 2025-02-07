@@ -1,4 +1,5 @@
 FROM python:alpine3.10
+FROM rust:1.67-alpine3.16
 COPY . /app
 WORKDIR /app
 RUN apk add --no-cache gcc musl-dev libffi-dev
